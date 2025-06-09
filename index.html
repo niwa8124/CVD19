@@ -473,10 +473,11 @@
         }
         
         function startStory() {
-            // Instead of showing static screen0, immediately call n8n for screen 0
+            // Hide intro screen
             document.getElementById('screen-intro').classList.remove('active');
             
             // Call n8n for the language selection screen
+            currentScreen = 0;
             makeChoice('start'); // This will trigger screen 0 in n8n
         }
         
@@ -518,9 +519,17 @@
             currentScreen++;
             totalScreens = Math.max(totalScreens, currentScreen + 1);
             
-            const newScreen = document.createElement('div');
-            newScreen.className = 'story-screen';
-            newScreen.id = `screen${currentScreen}`;
+            // If this is the first call (screen 0), use the existing screen0 element
+            let newScreen;
+            if (currentScreen === 1) {
+                newScreen = document.getElementById('screen0');
+                newScreen.innerHTML = ''; // Clear the loading text
+            } else {
+                newScreen = document.createElement('div');
+                newScreen.className = 'story-screen';
+                newScreen.id = `screen${currentScreen}`;
+                document.body.appendChild(newScreen);
+            }
             
             const imageUrl = data.imageUrl || getRandomImage();
             setBackgroundImage(newScreen, imageUrl);
@@ -556,10 +565,12 @@
             
             newScreen.appendChild(overlay);
             newScreen.appendChild(content);
-            document.body.appendChild(newScreen);
             
             setTimeout(() => {
-                document.querySelector('.story-screen.active').classList.remove('active');
+                const activeScreen = document.querySelector('.story-screen.active');
+                if (activeScreen) {
+                    activeScreen.classList.remove('active');
+                }
                 newScreen.classList.add('active');
                 updateProgress();
             }, 100);
