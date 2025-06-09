@@ -59,7 +59,19 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 8%;
+            background-image: inherit;
+            background-size: 150%;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: translateY(-100%);
+            animation: magnifyingScan 6s ease-in-out infinite;
+            z-index: 2;
+            mix-blend-mode: screen;
+            opacity: 0.7;
+        }
+        
+        .story-screen .overlay {
             background: linear-gradient(
                 to bottom,
                 transparent 0%,
@@ -67,7 +79,36 @@
                 transparent 4%
             );
             animation: progressiveScan 6s ease-in-out infinite;
-            z-index: 1;
+        }
+        
+        @keyframes magnifyingScan {
+            0% {
+                transform: translateY(-100%);
+            }
+            50% {
+                transform: translateY(calc(100vh - 8%));
+            }
+            51% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+        
+        @keyframes progressiveScan {
+            0% {
+                transform: translateY(-100%);
+            }
+            50% {
+                transform: translateY(100vh);
+            }
+            51% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
         }
         
         @keyframes breathing {
