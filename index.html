@@ -411,20 +411,11 @@
         </div>
     </div>
 
-    <!-- First question screen -->
+    <!-- First question screen - now handled by n8n -->
     <div class="story-screen" id="screen0">
         <div class="overlay"></div>
         <div class="content">
-            <div class="story-text">
-                When did touch become dangerous?<br>
-                <span class="japanese">いつから触れることが危険になったのか？</span>
-            </div>
-            <div class="choices">
-                <button class="choice" onclick="makeChoice('march2020')">March 2020<br><span class="japanese">2020年3月</span></button>
-                <button class="choice" onclick="makeChoice('before')">Before I knew<br><span class="japanese">気づく前から</span></button>
-                <button class="choice" onclick="makeChoice('always')">It always was<br><span class="japanese">ずっとそうだった</span></button>
-                <button class="choice" onclick="makeChoice('never')">Touch was never safe<br><span class="japanese">触れることは安全ではなかった</span></button>
-            </div>
+            <div class="story-text">Loading...</div>
         </div>
     </div>
 
@@ -482,16 +473,11 @@
         }
         
         function startStory() {
-            // Set background for first question screen
-            const screen0 = document.getElementById('screen0');
-            setBackgroundImage(screen0, IMAGE_BASE_URL + 'CVD19-00001.jpeg');
-            
+            // Instead of showing static screen0, immediately call n8n for screen 0
             document.getElementById('screen-intro').classList.remove('active');
-            document.getElementById('screen0').classList.add('active');
             
-            currentScreen = 0;
-            totalScreens = Math.max(totalScreens, currentScreen + 1);
-            updateProgress();
+            // Call n8n for the language selection screen
+            makeChoice('start'); // This will trigger screen 0 in n8n
         }
         
         async function makeChoice(choice) {
