@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Space Between Us</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            color: #fff;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        .story-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 1;
+        }
+        
+        .story-screen.active {
+            opacity: 1;
+            z-index: 10;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+        }
+        
+        .story-text {
+            font-size: 22px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .japanese {
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+            color: #ddd;
+            font-size: 20px;
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .choice {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 15px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            backdrop-filter: blur(5px);
+        }
+        
+        .choice:hover, .choice:active {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            color: #fff;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .email-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .email-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 15px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 15px 0;
+            font-family: inherit;
+            text-align: center;
+        }
+        
+        .email-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .amazon-link {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 20px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .amazon-link:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+        }
+        
+        .swipe-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            z-index: 50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        @media (max-width: 480px) {
+            .story-text {
+                font-size: 20px;
+            }
+            .content {
+                padding: 15px;
+            }
+            .choice {
+                padding: 12px 15px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress" id="progress"></div>
+    <div class="loading" id="loading">Generating your story...</div>
+    <div class="swipe-hint" id="swipeHint">Tap to choose your path</div>
+    
+    <!-- Initial screen -->
+    <div class="story-screen active" id="screen0">
+        <div class="overlay"></div>
+        <div class="content">
+            <div class="story-text">
+                When did touch become dangerous?<br><br>
+                <span class="japanese">いつから触れることが危険になったのか？</span>
+            </div>
+            <div class="choices">
+                <button class="choice" onclick="makeChoice('march2020')">March 2020 / 2020年3月</button>
+                <button class="choice" onclick="makeChoice('before')">Before I knew / 気づく前から</button>
+                <button class="choice" onclick="makeChoice('always')">It always was / ずっとそうだった</button>
+                <button class="choice" onclick="makeChoice('never')">Touch was never safe / 触れることは安全ではなかった</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 0;
+        let totalScreens = 1;
+        let userChoices = [];
+        let storyData = [];
+        
+        // Your n8n webhook URL - replace with your actual webhook
+        const N8N_WEBHOOK = 'https://your-n8n-instance.com/webhook/cv19-story';
+        
+        // Base URL for your GitHub images
+        const IMAGE_BASE_URL = 'https://niwa8124.github.io/CVD19/';
+        
+        function updateProgress() {
+            const progress = ((currentScreen + 1) / totalScreens) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function setBackgroundImage(screenElement, imageUrl) {
+            if (imageUrl) {
+                screenElement.style.backgroundImage = `url('${imageUrl}')`;
+            } else {
+                // Default background if no image specified
+                screenElement.style.background = 'linear-gradient(135deg, #1a1a1a, #2d2d2d)';
+            }
+        }
+        
+        async function makeChoice(choice) {
+            userChoices.push(choice);
+            showLoading();
+            
+            try {
+                // Send choice to n8n webhook
+                const response = await fetch(N8N_WEBHOOK, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        choice: choice,
+                        screen: currentScreen,
+                        userChoices: userChoices,
+                        sessionId: getSessionId()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const data = await response.json();
+                hideLoading();
+                
+                // Create next screen
+                createNextScreen(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                hideLoading();
+                
+                // Fallback to static content if n8n fails
+                createFallbackScreen(choice);
+            }
+        }
+        
+        function createNextScreen(data) {
+            currentScreen++;
+            totalScreens = Math.max(totalScreens, currentScreen + 1);
+            
+            const newScreen = document.createElement('div');
+            newScreen.className = 'story-screen';
+            newScreen.id = `screen${currentScreen}`;
+            
+            // Set background image
+            const imageUrl = data.imageUrl || getRandomImage();
+            setBackgroundImage(newScreen, imageUrl);
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            
+            const content = document.createElement('div');
+            content.className = 'content';
+            
+            const storyText = document.createElement('div');
+            storyText.className = 'story-text';
+            storyText.innerHTML = data.storyText || 'Story continues...';
+            
+            content.appendChild(storyText);
+            
+            // Add choices if this isn't the final screen
+            if (data.choices && data.choices.length > 0) {
+                const choicesDiv = document.createElement('div');
+                choicesDiv.className = 'choices';
+                
+                data.choices.forEach(choiceData => {
+                    const button = document.createElement('button');
+                    button.className = 'choice';
+                    button.textContent = choiceData.text;
+                    button.onclick = () => makeChoice(choiceData.value);
+                    choicesDiv.appendChild(button);
+                });
+                
+                content.appendChild(choicesDiv);
+            } else {
+                // This is the final screen - add email and Amazon link
+                addFinalScreenElements(content);
+            }
+            
+            newScreen.appendChild(overlay);
+            newScreen.appendChild(content);
+            document.body.appendChild(newScreen);
+            
+            // Hide current screen and show new one
+            setTimeout(() => {
+                document.querySelector('.story-screen.active').classList.remove('active');
+                newScreen.classList.add('active');
+                updateProgress();
+            }, 100);
+        }
+        
+        function addFinalScreenElements(content) {
+            const emailSection = document.createElement('div');
+            emailSection.className = 'email-section';
+            
+            const emailText = document.createElement('div');
+            emailText.innerHTML = 'Keep this memory:<br><span class="japanese">この記憶を保つ：</span>';
+            
+            const emailInput = document.createElement('input');
+            emailInput.type = 'email';
+            emailInput.className = 'email-input';
+            emailInput.placeholder = 'your@email.com';
+            emailInput.id = 'emailInput';
+            
+            const saveButton = document.createElement('button');
+            saveButton.className = 'choice';
+            saveButton.textContent = 'Remember together / 一緒に覚えている';
+            saveButton.onclick = saveEmail;
+            
+            const amazonLink = document.createElement('a');
+            amazonLink.className = 'amazon-link';
+            amazonLink.href = 'https://amazon.com/dp/YOUR_BOOK_ASIN'; // Replace with actual link
+            amazonLink.target = '_blank';
+            amazonLink.textContent = 'Hold the story / 物語を手にする';
+            
+            emailSection.appendChild(emailText);
+            emailSection.appendChild(emailInput);
+            emailSection.appendChild(saveButton);
+            content.appendChild(emailSection);
+            content.appendChild(amazonLink);
+            
+            // Hide swipe hint on final screen
+            document.getElementById('swipeHint').style.display = 'none';
+        }
+        
+        function createFallbackScreen(choice) {
+            // Static fallback content if n8n is not working
+            const fallbackData = {
+                storyText: `Your choice: ${choice}<br><br>We learned to read love in covered faces,<br><span class="japanese">私たちは覆われた顔に愛を読み取ることを学び、</span><br>to find warmth through latex and fear.<br><span class="japanese">ラテックスと恐怖を通して温もりを見つけた。</span>`,
+                choices: currentScreen < 3 ? [
+                    { text: 'Continue / 続ける', value: 'continue' }
+                ] : [],
+                imageUrl: getRandomImage()
+            };
+            
+            createNextScreen(fallbackData);
+        }
+        
+        function getRandomImage() {
+            // Return a random image from your collection
+            const imageNumber = Math.floor(Math.random() * 20) + 1;
+            const paddedNumber = imageNumber.toString().padStart(2, '0');
+            return `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpg`;
+        }
+        
+        function getSessionId() {
+            let sessionId = localStorage.getItem('cv19-session');
+            if (!sessionId) {
+                sessionId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('cv19-session', sessionId);
+            }
+            return sessionId;
+        }
+        
+        async function saveEmail() {
+            const email = document.getElementById('emailInput').value;
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                // Send email to n8n for storage
+                await fetch(N8N_WEBHOOK + '/email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        sessionId: getSessionId(),
+                        userChoices: userChoices,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                // Show confirmation
+                const saveButton = event.target;
+                saveButton.textContent = 'Saved / 保存済み';
+                saveButton.disabled = true;
+                saveButton.style.opacity = '0.6';
+                
+            } catch (error) {
+                console.error('Error saving email:', error);
+                // Still show success to user
+                const saveButton = event.target;
+                saveButton.textContent = 'Saved / 保存済み';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial background
+            const initialScreen = document.getElementById('screen0');
+            setBackgroundImage(initialScreen, IMAGE_BASE_URL + 'CVD19-testimage.jpg');
+            
+            updateProgress();
+            
+            // Preload some images
+            for (let i = 1; i <= 5; i++) {
+                const img = new Image();
+                const paddedNumber = i.toString().padStart(2, '0');
+                img.src = `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpg`;
+            }
+        });
+    </script>
+</body>
+</html>
