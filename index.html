@@ -19,15 +19,6 @@
             user-select: none;
         }
         
-        @keyframes breathing {
-            0%, 100% { 
-                transform: scale(1.0);
-            }
-            50% { 
-                transform: scale(1.08);
-            }
-        }
-        
         .story-screen {
             position: fixed;
             top: 0;
@@ -45,6 +36,15 @@
             transition: opacity 0.5s ease;
             z-index: 1;
             animation: breathing 3s ease-in-out infinite;
+        }
+        
+        @keyframes breathing {
+            0%, 100% { 
+                transform: scale(1.0);
+            }
+            50% { 
+                transform: scale(1.08);
+            }
         }
         
         .story-screen.active {
@@ -143,31 +143,6 @@
             display: none;
         }
         
-        .email-section {
-            margin-top: 30px;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .email-input {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-            padding: 15px;
-            font-size: 16px;
-            width: 100%;
-            max-width: 300px;
-            margin: 15px 0;
-            font-family: inherit;
-            text-align: center;
-        }
-        
-        .email-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
         .amazon-link {
             display: inline-block;
             background: rgba(255, 255, 255, 0.1);
@@ -221,12 +196,31 @@
     <div class="loading" id="loading">Generating your story...</div>
     <div class="swipe-hint" id="swipeHint">Tap to choose your path</div>
     
-    <!-- Initial screen -->
-    <div class="story-screen active" id="screen0">
+    <!-- Opening atmospheric screen -->
+    <div class="story-screen active" id="screen-intro">
         <div class="overlay"></div>
         <div class="content">
+            <div class="story-text" style="margin-bottom: 60px;">
+                <div style="font-size: 32px; margin-bottom: 20px; letter-spacing: 2px;">CV19</div>
+                <div style="font-size: 18px; color: #ccc;">Takano</div>
+            </div>
+            <div class="tap-to-begin">
+                <button class="choice" onclick="startStory()" style="font-size: 16px; padding: 20px 40px; aspect-ratio: auto;">
+                    Tap to begin<br><span class="japanese">タップして始める</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- First question screen -->
+    <div class="story-screen" id="screen0">
+        <div class="overlay"></div>
+        <div class="content">
+            <div style="font-size: 14px; color: #999; margin-bottom: 30px; text-align: center;">
+                CV19 — Takano
+            </div>
             <div class="story-text">
-                When did touch become dangerous?<br><br>
+                When did touch become dangerous?<br>
                 <span class="japanese">いつから触れることが危険になったのか？</span>
             </div>
             <div class="choices">
@@ -239,8 +233,8 @@
     </div>
 
     <script>
-        let currentScreen = -1; // Start at -1 since intro screen is before screen 0
-        let totalScreens = 2; // Intro + first question screen
+        let currentScreen = -1;
+        let totalScreens = 2;
         let userChoices = [];
         let storyData = [];
         
@@ -251,7 +245,7 @@
         const IMAGE_BASE_URL = 'https://niwa8124.github.io/CVD19/';
         
         function updateProgress() {
-            const progress = ((currentScreen + 2) / totalScreens) * 100; // +2 to account for intro screen at -1
+            const progress = ((currentScreen + 2) / totalScreens) * 100;
             document.getElementById('progress').style.width = progress + '%';
         }
         
@@ -271,17 +265,31 @@
             if (imageUrl) {
                 screenElement.style.backgroundImage = `url('${imageUrl}')`;
             } else {
-                // Default background if no image specified
                 screenElement.style.background = 'linear-gradient(135deg, #1a1a1a, #2d2d2d)';
             }
         }
         
+        function getRandomOpeningImage() {
+            const openingImages = [
+                'CVD19-00007inv.jpeg',
+                'CVD19-00008inv.jpeg', 
+                'CVD19-00009inv.jpeg'
+            ];
+            const randomIndex = Math.floor(Math.random() * openingImages.length);
+            return `${IMAGE_BASE_URL}${openingImages[randomIndex]}`;
+        }
+        
+        function getRandomImage() {
+            const imageNumber = Math.floor(Math.random() * 13) + 1;
+            const paddedNumber = imageNumber.toString().padStart(5, '0');
+            return `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpeg`;
+        }
+        
         function startStory() {
-            // Hide intro screen and show first question
             document.getElementById('screen-intro').classList.remove('active');
             document.getElementById('screen0').classList.add('active');
             
-            currentScreen = 0; // Now we're at the first question screen
+            currentScreen = 0;
             totalScreens = Math.max(totalScreens, currentScreen + 1);
             updateProgress();
         }
@@ -291,7 +299,6 @@
             showLoading();
             
             try {
-                // Send choice to n8n webhook
                 const response = await fetch(N8N_WEBHOOK, {
                     method: 'POST',
                     headers: {
@@ -312,14 +319,11 @@
                 const data = await response.json();
                 hideLoading();
                 
-                // Create next screen
                 createNextScreen(data);
                 
             } catch (error) {
                 console.error('Error:', error);
                 hideLoading();
-                
-                // Fallback to static content if n8n fails
                 createFallbackScreen(choice);
             }
         }
@@ -332,7 +336,6 @@
             newScreen.className = 'story-screen';
             newScreen.id = `screen${currentScreen}`;
             
-            // Set background image
             const imageUrl = data.imageUrl || getRandomImage();
             setBackgroundImage(newScreen, imageUrl);
             
@@ -348,7 +351,6 @@
             
             content.appendChild(storyText);
             
-            // Add choices if this isn't the final screen
             if (data.choices && data.choices.length > 0) {
                 const choicesDiv = document.createElement('div');
                 choicesDiv.className = 'choices';
@@ -356,14 +358,13 @@
                 data.choices.forEach(choiceData => {
                     const button = document.createElement('button');
                     button.className = 'choice';
-                    button.textContent = choiceData.text;
+                    button.innerHTML = choiceData.text;
                     button.onclick = () => makeChoice(choiceData.value);
                     choicesDiv.appendChild(button);
                 });
                 
                 content.appendChild(choicesDiv);
             } else {
-                // This is the final screen - add email and Amazon link
                 addFinalScreenElements(content);
             }
             
@@ -371,7 +372,6 @@
             newScreen.appendChild(content);
             document.body.appendChild(newScreen);
             
-            // Hide current screen and show new one
             setTimeout(() => {
                 document.querySelector('.story-screen.active').classList.remove('active');
                 newScreen.classList.add('active');
@@ -380,67 +380,27 @@
         }
         
         function addFinalScreenElements(content) {
-            const emailSection = document.createElement('div');
-            emailSection.className = 'email-section';
-            
-            const emailText = document.createElement('div');
-            emailText.innerHTML = 'Keep this memory:<br><span class="japanese">この記憶を保つ：</span>';
-            
-            const emailInput = document.createElement('input');
-            emailInput.type = 'email';
-            emailInput.className = 'email-input';
-            emailInput.placeholder = 'your@email.com';
-            emailInput.id = 'emailInput';
-            
-            const saveButton = document.createElement('button');
-            saveButton.className = 'choice';
-            saveButton.textContent = 'Remember together / 一緒に覚えている';
-            saveButton.onclick = saveEmail;
-            
             const amazonLink = document.createElement('a');
             amazonLink.className = 'amazon-link';
             amazonLink.href = 'https://amzn.asia/d/8royqy6';
             amazonLink.target = '_blank';
             amazonLink.textContent = 'Hold the story / 物語を手にする';
             
-            emailSection.appendChild(emailText);
-            emailSection.appendChild(emailInput);
-            emailSection.appendChild(saveButton);
-            content.appendChild(emailSection);
             content.appendChild(amazonLink);
             
-            // Hide swipe hint on final screen
             document.getElementById('swipeHint').style.display = 'none';
         }
         
         function createFallbackScreen(choice) {
-            // Static fallback content if n8n is not working
             const fallbackData = {
                 storyText: `Your choice: ${choice}<br><br>We learned to read love in covered faces,<br><span class="japanese">私たちは覆われた顔に愛を読み取ることを学び、</span><br>to find warmth through latex and fear.<br><span class="japanese">ラテックスと恐怖を通して温もりを見つけた。</span>`,
                 choices: currentScreen < 3 ? [
-                    { text: 'Continue / 続ける', value: 'continue' }
+                    { text: 'Continue<br><span class="japanese">続ける</span>', value: 'continue' }
                 ] : [],
                 imageUrl: getRandomImage()
             };
             
             createNextScreen(fallbackData);
-        }
-        
-        function getRandomOpeningImage() {
-            const openingImages = [
-                'CVD19-00007inv.jpeg',
-                'CVD19-00008inv.jpeg', 
-                'CVD19-00009inv.jpeg'
-            ];
-            const randomIndex = Math.floor(Math.random() * openingImages.length);
-            return `${IMAGE_BASE_URL}${openingImages[randomIndex]}`;
-        }
-        
-        function getRandomImage() {
-            // Return a random image from your collection
-            const imageNumber = Math.floor(Math.random() * 13) + 1;
-            const paddedNumber = imageNumber.toString().padStart(5, '0');
-            return `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpeg`;
         }
         
         function getSessionId() {
@@ -452,50 +412,16 @@
             return sessionId;
         }
         
-        async function saveEmail() {
-            const email = document.getElementById('emailInput').value;
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email address');
-                return;
-            }
-            
-            try {
-                // Send email to n8n for storage
-                await fetch(N8N_WEBHOOK + '/email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        sessionId: getSessionId(),
-                        userChoices: userChoices,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                
-                // Show confirmation
-                const saveButton = event.target;
-                saveButton.textContent = 'Saved / 保存済み';
-                saveButton.disabled = true;
-                saveButton.style.opacity = '0.6';
-                
-            } catch (error) {
-                console.error('Error saving email:', error);
-                // Still show success to user
-                const saveButton = event.target;
-                saveButton.textContent = 'Saved / 保存済み';
-            }
-        }
-        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Set random opening background
+            console.log('DOM loaded, looking for intro screen...');
             const introScreen = document.getElementById('screen-intro');
+            
             if (introScreen) {
+                console.log('Intro screen found, setting background...');
                 setBackgroundImage(introScreen, getRandomOpeningImage());
             } else {
-                console.error('Intro screen not found');
+                console.error('Intro screen not found in DOM');
             }
             
             updateProgress();
