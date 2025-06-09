@@ -36,6 +36,77 @@
             transition: opacity 0.5s ease;
             z-index: 1;
             animation: breathing 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+        
+        .story-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(0, 255, 100, 0.3) 2%,
+                transparent 4%
+            );
+            animation: progressiveScan 6s ease-in-out infinite;
+            z-index: 1;
+        }
+        
+        .story-screen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8%;
+            background-image: inherit;
+            background-size: 120%;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: translateY(-100%);
+            animation: magnifyingScan 6s ease-in-out infinite;
+            z-index: 2;
+            mix-blend-mode: lighten;
+            opacity: 0.8;
+        }
+        
+        @keyframes progressiveScan {
+            0% {
+                transform: translateY(-100%);
+            }
+            50% {
+                transform: translateY(100vh);
+            }
+            51% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+        
+        @keyframes magnifyingScan {
+            0% {
+                transform: translateY(-100%);
+                background-size: 120%;
+            }
+            25% {
+                background-size: 130%;
+            }
+            50% {
+                transform: translateY(calc(100vh - 8%));
+                background-size: 120%;
+            }
+            51% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
         }
         
         @keyframes breathing {
