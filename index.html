@@ -74,13 +74,12 @@
             font-size: 22px;
             line-height: 1.6;
             margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
         
         .japanese {
             font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', sans-serif;
-            color: #ddd;
-            font-size: 14px;
+            color: #ccc;
+            font-size: 24px;
         }
         
         .choices {
@@ -201,12 +200,12 @@
         <div class="overlay"></div>
         <div class="content">
             <div class="story-text" style="margin-bottom: 60px;">
-                <div style="font-size: 32px; margin-bottom: 20px; letter-spacing: 2px;">CV19</div>
-                <div style="font-size: 18px; color: #ccc;">Ryudai Takano<br><span class="japanese">鷹野隆大</span></div>
+                <div style="font-size: 48px; margin-bottom: 30px; letter-spacing: 3px; color: #ff00ff;">CVD19</div>
+                <div style="font-size: 24px; color: #ccc;">Ryudai Takano<br><span class="japanese">鷹野隆大</span></div>
             </div>
             <div class="tap-to-begin">
-                <button class="choice" onclick="startStory()" style="font-size: 16px; padding: 20px 40px; aspect-ratio: auto;">
-                    Tap to begin<br><span class="japanese">タップして始める</span>
+                <button class="choice" onclick="startStory()" style="font-size: 16px; padding: 20px 40px; aspect-ratio: auto; border: 1px solid #ffff00;">
+                    touch
                 </button>
             </div>
         </div>
@@ -216,9 +215,6 @@
     <div class="story-screen" id="screen0">
         <div class="overlay"></div>
         <div class="content">
-            <div style="font-size: 14px; color: #999; margin-bottom: 30px; text-align: center;">
-                CV19 — Ryudai Takano 鷹野隆大
-            </div>
             <div class="story-text">
                 When did touch become dangerous?<br>
                 <span class="japanese">いつから触れることが危険になったのか？</span>
@@ -427,6 +423,9 @@
             } else {
                 console.error('Intro screen not found in DOM');
             }
+            
+            // Hide swipe hint immediately
+            document.getElementById('swipeHint').style.display = 'none';
             
             updateProgress();
             
