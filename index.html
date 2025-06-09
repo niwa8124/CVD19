@@ -571,7 +571,9 @@
                 if (activeScreen) {
                     activeScreen.classList.remove('active');
                 }
-                newScreen.classList.add('active');
+                if (newScreen) {
+                    newScreen.classList.add('active');
+                }
                 updateProgress();
             }, 100);
         }
