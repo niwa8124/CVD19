@@ -473,9 +473,7 @@
         }
         
         function startStory() {
-            // Instead of showing static screen0, immediately call n8n for screen 0
-            document.getElementById('screen-intro').classList.remove('active');
-            
+            // Don't hide intro screen here - let createNextScreen handle it
             // Call n8n for the language selection screen
             makeChoice('start'); // This will trigger screen 0 in n8n
         }
@@ -571,13 +569,14 @@
             document.body.appendChild(newScreen);
             
             setTimeout(() => {
+                // Find any currently active screen (including intro)
                 const activeScreen = document.querySelector('.story-screen.active');
                 if (activeScreen) {
                     activeScreen.classList.remove('active');
                 }
-                if (newScreen) {
-                    newScreen.classList.add('active');
-                }
+                
+                // Activate the new screen
+                newScreen.classList.add('active');
                 updateProgress();
             }, 100);
         }
