@@ -264,6 +264,10 @@
         }
         
         function setBackgroundImage(screenElement, imageUrl) {
+            if (!screenElement) {
+                console.error('Screen element not found');
+                return;
+            }
             if (imageUrl) {
                 screenElement.style.backgroundImage = `url('${imageUrl}')`;
             } else {
@@ -488,7 +492,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Set random opening background
             const introScreen = document.getElementById('screen-intro');
-            setBackgroundImage(introScreen, getRandomOpeningImage());
+            if (introScreen) {
+                setBackgroundImage(introScreen, getRandomOpeningImage());
+            } else {
+                console.error('Intro screen not found');
+            }
             
             updateProgress();
             
