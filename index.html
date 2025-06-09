@@ -262,16 +262,130 @@
             50% { opacity: 1; }
         }
         
-        @media (max-width: 480px) {
+        /* Base mobile-first responsive design */
+        @media (max-width: 768px) {
             .story-text {
                 font-size: 20px;
+                margin-bottom: 25px;
+                max-height: 45vh;
             }
             .content {
                 padding: 15px;
+                max-width: 92%;
             }
             .choice {
-                padding: 12px 15px;
+                padding: 10px;
+                font-size: 13px;
+                min-height: 75px;
+            }
+            .choices {
+                gap: 12px;
+                margin-top: 20px;
+            }
+            .japanese-block {
+                font-size: 17px;
+            }
+        }
+        
+        /* Small smartphones (iPhone SE, Galaxy S, etc.) */
+        @media (max-width: 480px) {
+            .story-text {
+                font-size: 18px;
+                margin-bottom: 20px;
+                max-height: 40vh;
+            }
+            .content {
+                padding: 15px 10px;
+                max-width: 95%;
+            }
+            .choice {
+                padding: 8px;
+                font-size: 12px;
+                min-height: 70px;
+                line-height: 1.1;
+            }
+            .choices {
+                gap: 10px;
+                margin-top: 15px;
+            }
+            .japanese-block {
+                font-size: 16px;
+                margin-top: 15px;
+                padding-top: 10px;
+            }
+        }
+        
+        /* Very small smartphones */
+        @media (max-width: 360px) {
+            .story-text {
+                font-size: 16px;
+                margin-bottom: 15px;
+                max-height: 35vh;
+            }
+            .choice {
+                padding: 6px;
+                font-size: 11px;
+                min-height: 65px;
+            }
+            .choices {
+                gap: 8px;
+            }
+            .japanese-block {
                 font-size: 15px;
+            }
+        }
+        
+        /* Short screens (landscape phones, older phones) */
+        @media (max-height: 667px) {
+            .story-text {
+                font-size: 18px;
+                margin-bottom: 15px;
+                max-height: 35vh;
+            }
+            .choices {
+                margin-top: 10px;
+                gap: 8px;
+            }
+            .choice {
+                padding: 6px;
+                font-size: 11px;
+                min-height: 60px;
+            }
+        }
+        
+        /* Very short screens */
+        @media (max-height: 568px) {
+            .story-text {
+                font-size: 16px;
+                margin-bottom: 10px;
+                max-height: 30vh;
+            }
+            .choice {
+                padding: 5px;
+                font-size: 10px;
+                min-height: 50px;
+            }
+            .japanese-block {
+                font-size: 14px;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Extremely small screens */
+        @media (max-height: 480px) {
+            .story-text {
+                font-size: 14px;
+                margin-bottom: 8px;
+                max-height: 25vh;
+            }
+            .choice {
+                padding: 4px;
+                font-size: 9px;
+                min-height: 45px;
+            }
+            .choices {
+                gap: 6px;
+                margin-top: 8px;
             }
         }
     </style>
