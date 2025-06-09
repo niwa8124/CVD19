@@ -19,6 +19,15 @@
             user-select: none;
         }
         
+        @keyframes breathing {
+            0%, 100% { 
+                transform: scale(1.0);
+            }
+            50% { 
+                transform: scale(1.08);
+            }
+        }
+        
         .story-screen {
             position: fixed;
             top: 0;
@@ -35,6 +44,7 @@
             opacity: 0;
             transition: opacity 0.5s ease;
             z-index: 1;
+            animation: breathing 3s ease-in-out infinite;
         }
         
         .story-screen.active {
@@ -70,26 +80,37 @@
         .japanese {
             font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', sans-serif;
             color: #ddd;
-            font-size: 20px;
+            font-size: 14px;
         }
         
         .choices {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-top: 30px;
+            max-width: 400px;
+            width: 100%;
         }
         
         .choice {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
             color: #fff;
-            padding: 15px 20px;
-            font-size: 16px;
+            padding: 15px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: inherit;
             backdrop-filter: blur(5px);
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.3;
+            flex-direction: column;
+            white-space: normal;
         }
         
         .choice:hover, .choice:active {
@@ -209,10 +230,10 @@
                 <span class="japanese">いつから触れることが危険になったのか？</span>
             </div>
             <div class="choices">
-                <button class="choice" onclick="makeChoice('march2020')">March 2020 / 2020年3月</button>
-                <button class="choice" onclick="makeChoice('before')">Before I knew / 気づく前から</button>
-                <button class="choice" onclick="makeChoice('always')">It always was / ずっとそうだった</button>
-                <button class="choice" onclick="makeChoice('never')">Touch was never safe / 触れることは安全ではなかった</button>
+                <button class="choice" onclick="makeChoice('march2020')">March 2020<br><span class="japanese">2020年3月</span></button>
+                <button class="choice" onclick="makeChoice('before')">Before I knew<br><span class="japanese">気づく前から</span></button>
+                <button class="choice" onclick="makeChoice('always')">It always was<br><span class="japanese">ずっとそうだった</span></button>
+                <button class="choice" onclick="makeChoice('never')">Touch was never safe<br><span class="japanese">触れることは安全ではなかった</span></button>
             </div>
         </div>
     </div>
@@ -249,6 +270,14 @@
                 // Default background if no image specified
                 screenElement.style.background = 'linear-gradient(135deg, #1a1a1a, #2d2d2d)';
             }
+        }
+        
+        function startStory() {
+            // Hide intro screen and show first question
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('screen0').classList.add('active');
+            
+            updateProgress();
         }
         
         async function makeChoice(choice) {
@@ -391,6 +420,16 @@
             createNextScreen(fallbackData);
         }
         
+        function getRandomOpeningImage() {
+            const openingImages = [
+                'CVD19-00007inv.jpeg',
+                'CVD19-00008inv.jpeg', 
+                'CVD19-00009inv.jpeg'
+            ];
+            const randomIndex = Math.floor(Math.random() * openingImages.length);
+            return `${IMAGE_BASE_URL}${openingImages[randomIndex]}`;
+        }
+        
         function getRandomImage() {
             // Return a random image from your collection
             const imageNumber = Math.floor(Math.random() * 13) + 1;
@@ -445,9 +484,9 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Set initial background
-            const initialScreen = document.getElementById('screen0');
-            setBackgroundImage(initialScreen, IMAGE_BASE_URL + 'CVD19-00001.jpeg');
+            // Set random opening background
+            const introScreen = document.getElementById('screen-intro');
+            setBackgroundImage(introScreen, getRandomOpeningImage());
             
             updateProgress();
             
@@ -457,6 +496,13 @@
                 const paddedNumber = i.toString().padStart(5, '0');
                 img.src = `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpeg`;
             }
+            
+            // Preload opening images
+            const openingImages = ['CVD19-00007inv.jpeg', 'CVD19-00008inv.jpeg', 'CVD19-00009inv.jpeg'];
+            openingImages.forEach(imageName => {
+                const img = new Image();
+                img.src = `${IMAGE_BASE_URL}${imageName}`;
+            });
         });
     </script>
 </body>
