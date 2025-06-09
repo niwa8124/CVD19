@@ -393,9 +393,9 @@
         
         function getRandomImage() {
             // Return a random image from your collection
-            const imageNumber = Math.floor(Math.random() * 20) + 1;
-            const paddedNumber = imageNumber.toString().padStart(2, '0');
-            return `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpg`;
+            const imageNumber = Math.floor(Math.random() * 13) + 1;
+            const paddedNumber = imageNumber.toString().padStart(5, '0');
+            return `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpeg`;
         }
         
         function getSessionId() {
@@ -447,15 +447,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Set initial background
             const initialScreen = document.getElementById('screen0');
-            setBackgroundImage(initialScreen, IMAGE_BASE_URL + 'CVD19-testimage.jpg');
+            setBackgroundImage(initialScreen, IMAGE_BASE_URL + 'CVD19-00001.jpeg');
             
             updateProgress();
             
             // Preload some images
             for (let i = 1; i <= 5; i++) {
                 const img = new Image();
-                const paddedNumber = i.toString().padStart(2, '0');
-                img.src = `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpg`;
+                const paddedNumber = i.toString().padStart(5, '0');
+                img.src = `${IMAGE_BASE_URL}CVD19-${paddedNumber}.jpeg`;
             }
         });
     </script>
