@@ -239,8 +239,8 @@
     </div>
 
     <script>
-        let currentScreen = 0;
-        let totalScreens = 1;
+        let currentScreen = -1; // Start at -1 since intro screen is before screen 0
+        let totalScreens = 2; // Intro + first question screen
         let userChoices = [];
         let storyData = [];
         
@@ -251,7 +251,7 @@
         const IMAGE_BASE_URL = 'https://niwa8124.github.io/CVD19/';
         
         function updateProgress() {
-            const progress = ((currentScreen + 1) / totalScreens) * 100;
+            const progress = ((currentScreen + 2) / totalScreens) * 100; // +2 to account for intro screen at -1
             document.getElementById('progress').style.width = progress + '%';
         }
         
@@ -277,6 +277,8 @@
             document.getElementById('screen-intro').classList.remove('active');
             document.getElementById('screen0').classList.add('active');
             
+            currentScreen = 0; // Now we're at the first question screen
+            totalScreens = Math.max(totalScreens, currentScreen + 1);
             updateProgress();
         }
         
